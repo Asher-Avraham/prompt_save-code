@@ -1,0 +1,22 @@
+### STAGE 1: Build ###
+# This stage builds the React application into static files.
+FROM node:18-alpine AS build
+
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . . 
+RUN npm run build
+
+### STAGE 2: Production ###
+# This stage serves the static files using a lightweight Nginx server.
+FROM nginx:stable-alpine
+
+# Copy the built static files from the 'build' stage
+COPY --from=build /app/build /usr/share/nginx/html
+
+# Nginx listens on port 80 by default, no need to expose it here
+# as it's done in docker-compose.yml.
+
+# When the container starts, Nginx will serve the files.
+CMD ["nginx", "-g", "daemon off;"]
