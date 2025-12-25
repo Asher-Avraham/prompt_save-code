@@ -1,29 +1,53 @@
-name: cicd
+name: Full CI/CD Pipeline
 
 on:
   push:
-    branches: [main]
+    branches: ["main", "feature/*"]
+  pull_request:
+    branches: ["main"]
+
+env:
+  BACKEND_REPO: PLACEHOLDER
+  FRONTEND_REPO: PLACEHOLDER
+  DOCKER_HUB_REPO: PLACEHOLDER
+  AWS_REGION: ap-south-1
+  GITOPS_REPO: PLACEHOLDER
 
 jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: checkout repo
-        uses: actions/checkout@v3
-      - name: install dependencies
-        run: npm i
-      - name: build app
-        run: npm build
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-artifacts
-          path: ./.next
-          include-hidden-files: true
-
   test:
-    needs: setup-and-build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Download build artifact
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Backend Unit Tests
+        run: |
+          cd backend
+          npm ci
+          npm test
+
+      - name: Frontend Unit Tests
+        run: |
+          cd frontend
+          npm ci
+          npm test
+
+      - name: Setup Integration tests
+        if: github.ref == 'refs/heads/main' || github.event_name == 'pull_request'
+        run: |
+          docker compose -f docker-compose.test.yaml up -d --build --wait --quiet-pull
+
+      - name: Run Integration tests
+        if: github.ref == 'refs/heads/main' || github.event_name == 'pull_request'
+        run: |
+          npm ci
+          TEST_BASE_URL=http://localhost:80 npm run test:integration
+
+      - name: Clean up Integration setup
+        if: always()
+        run: docker compose -f docker-compose.test.yaml down -v
