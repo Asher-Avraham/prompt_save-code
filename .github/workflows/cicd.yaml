@@ -98,3 +98,28 @@ jobs:
           tags: ${{env.FRONTEND_REPO}}:${{github.sha}}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  gitops-deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Gitops Repo
+        uses: actions/checkout@v4
+        with:
+          repository: ${{env.GITOPS_REPO}}
+          token: ${{secrets.GITOPS_PAT}}
+
+      - name: Update K8s manifest -kustomize
+        run: |
+          cd overlays/production
+          #! the names must match the names in k8s deployment
+          kustomize edit set image backend-api=${{env.BACKEND_REPO}}:${{github.sha}}
+          kustomize edit set image frontend-api=${{env.FRONTEND_REPO}}:${{github.sha}}
+
+      - name: Commit and Push to GitOps Repo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@user.noreply.github.com"
+          git add .
+          git commit -m "chore: update frontend and backend to ${{github.sha}}"
+          git push
