@@ -1,0 +1,52 @@
+services:
+  # 1. The Database: Needs a healthcheck
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: testdb
+      POSTGRES_PASSWORD: password
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d testdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # 2. The Backend: Waits for DB to be "healthy" (not just "started")
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      # Use the internal docker hostname 'db'
+      DB_HOST: db
+      DB_USER: postgres
+      DB_PASSWORD: password
+      DB_DATABASE: testdb
+      DB_PORT: 5432
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:5001/api/status || exit 1"]
+      interval: 5s
+      retries: 5
+
+  # 3. The Frontend: Built and served
+  frontend:
+    build: ./frontend
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  # 4. Nginx: The Entry Point for your tests
+  nginx:
+    image: nginx:alpine
+    volumes:
+      - ./nginx.test.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - "80:80"
+    depends_on:
+      frontend:
+        condition: service_started
+      backend:
+        condition: service_healthy

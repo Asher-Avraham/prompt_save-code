@@ -105,7 +105,11 @@ app.delete('/api/prompts/:id', async (req, res) => {
 })
 
 // --- Start Server ---
-app.listen(port, () => {
-    console.log(`Backend server listening at http://localhost:${port}`)
-    initializeDb()
-})
+if (require.main === module) {
+    app.listen(port, () => {
+        console.log(`Backend server listening at http://localhost:${port}`)
+        initializeDb()
+    })
+}
+
+module.exports = app

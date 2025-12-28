@@ -1,0 +1,13 @@
+{
+  "name": "three-tier-app",
+  "version": "1.0.0",
+  "description": "Root package.json for integration tests",
+  "scripts": {
+    "test:integration": "jest tests/integration.test.js"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "axios": "^1.6.0"
+  }
+}
