@@ -30,27 +30,26 @@ jobs:
           npm ci
           npm test
 
-#       - name: Frontend Unit Tests
-#         run: |
-#           cd frontend
-#           npm ci
-#           npm test
+      - name: Frontend Unit Tests
+        run: |
+          cd frontend
+          npm ci
+          npm test
 
-#       - name: Start Integration Stack
-#         if: github.ref == 'refs/heads/main' || github.event_name == 'pull_request'
-#         run: |
-#           docker compose -f compose.test.yml up -d --build --wait --quiet-pull
+      - name: Start Integration Stack
+        if: github.ref == 'refs/heads/main' || github.event_name == 'pull_request'
+        run: |
+          docker compose -f compose.test.yml up -d --build --wait --quiet-pull
 
-#       - name: Run Integration Tests
-#         if: github.ref == 'refs/heads/main' || github.event_name == 'pull_request'
-#         run: |
-#           npm ci
-#           TEST_BASE_URL=http://localhost:80 npm run test:integration
+      - name: Run Integration Tests
+        if: github.ref == 'refs/heads/main' || github.event_name == 'pull_request'
+        run: |
+          npm ci
+          TEST_BASE_URL=http://localhost:80 npm run test:integration
 
-#       - name: Stop and Cleanup
-#         if: always()
-#         run: docker compose -f compose.test.yml down -v
-
+      - name: Stop and Cleanup
+        if: always()
+        run: docker compose -f compose.test.yml down -v
 #   security:
 #     runs-on: ubuntu-latest
 #     steps:
