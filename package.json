@@ -5,9 +5,8 @@
   "scripts": {
     "test:integration": "jest tests/integration.test.js"
   },
-  "dependencies": {},
   "devDependencies": {
-    "jest": "^29.7.0",
-    "axios": "^1.6.0"
+    "axios": "^1.6.0",
+    "jest": "^30.2.0"
   }
 }
