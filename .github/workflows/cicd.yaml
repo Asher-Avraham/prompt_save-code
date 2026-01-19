@@ -7,9 +7,9 @@ on:
     branches: ["main"]
 
 env:
-  BACKEND_REPO: PLACEHOLDER_BACKEND
-  FRONTEND_REPO: PLACEHOLDER_FRONTEND
-  AWS_REGION: ap-south-1
+  BACKEND_REPO: ashiavraham/three-tier-backend
+  FRONTEND_REPO: ashiavraham/three-tier-frontend
+  # AWS_REGION: ap-south-1
   GITOPS_REPO: PLACEHOLDER_GITOPS
 
 jobs:
@@ -59,7 +59,7 @@ jobs:
       security-events: write
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
@@ -67,6 +67,7 @@ jobs:
 
       - name: Run CodeQL Analysis
         uses: github/codeql-action/analyze@v3
+
   build-and-push:
     needs: [test, security]
     if: github.ref == 'refs/heads/main'
@@ -76,6 +77,12 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
+
+      #       - name: Configure AWS credentials
+      #         uses: aws-actions/configure-aws-credentials@v4
+      #         with:
+      #           role-to-assume: arn:aws:iam::PLACEHOLDER_AWS_ACCOUNT:role/github-actions-role
+      #           aws-region: ${{env.AWS_REGION}}
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -103,7 +110,6 @@ jobs:
           tags: ${{env.FRONTEND_REPO}}:${{github.sha}}
           cache-from: type=gha
           cache-to: type=gha, mode=max
-
 #   gitops-deploy:
 #     needs: build-and-push
 #     runs-on: ubuntu-latest
