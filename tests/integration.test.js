@@ -11,7 +11,7 @@ describe('Integration Tests', () => {
       const response = await axios.get(BASE_URL);
       expect(response.status).toBe(200);
       // Check for something specific in the frontend HTML, e.g., the title
-      expect(response.data).toContain('<title>React App</title>');
+      expect(response.data).toContain('<title>Prompt Save</title>');
     } catch (error) {
       // Fail with a clear message if connection is refused or other error
       throw new Error(`Failed to connect to Frontend at ${BASE_URL}: ${error.message}`);
