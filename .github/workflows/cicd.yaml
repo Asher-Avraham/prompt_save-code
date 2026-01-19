@@ -50,13 +50,13 @@ jobs:
       - name: Stop and Cleanup
         if: always()
         run: docker compose -f compose.test.yml down -v
-#   security:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - uses: actions/checkout@v4
-#       - name: Run CodeQL Analysis
-#         uses: github/codeql-action/analyze@v3
 
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
 #   build-and-push:
 #     needs: [test, security]
 #     if: github.ref == 'refs/heads/main'
