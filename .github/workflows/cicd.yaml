@@ -10,7 +10,7 @@ env:
   BACKEND_REPO: ashiavraham/three-tier-backend
   FRONTEND_REPO: ashiavraham/three-tier-frontend
   # AWS_REGION: ap-south-1
-  GITOPS_REPO: PLACEHOLDER_GITOPS
+  GITOPS_REPO: PLACEHOLDER_GITOPSs
 
 jobs:
   test:
